@@ -1,5 +1,4 @@
 const { knex } = require('../conexao')
-const conexao = require('../conexao')
 
 const listarProdutos = async (req, res) => {
     const { id } = req.usuario
@@ -149,10 +148,12 @@ const excluirProduto = async (req, res) => {
     const { id } = req.params
 
     try {
-        const query = `select * from produtos where usuario_id = $1 and id = $2`
-        const { rowCount } = await conexao.query(query, [usuario.id, id])
+        const produto = await knex('produtos')
+            .where({ usuario_id: usuario.id, id: id })
+            .first()
+            .debug()
 
-        if (rowCount === 0) {
+        if (!produto) {
             return res.status(404).json('Produto não encontrado')
         }
 
